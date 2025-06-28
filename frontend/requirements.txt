@@ -1,0 +1,4 @@
+streamlit
+requests
+sseclient-py
+python-dotenv

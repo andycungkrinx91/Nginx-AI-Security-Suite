@@ -1,0 +1,33 @@
+services:
+  # The FastAPI Backend Service
+  backend:
+    build: ./backend
+    container_name: analyzer_backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/code
+      - ./backend/vector_store:/code/vector_store
+    env_file:
+      - .env
+    networks:
+      - analyzer_net
+
+  # The Streamlit Frontend Service
+  frontend:
+    build: ./frontend
+    container_name: analyzer_frontend
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./frontend:/app
+    depends_on:
+      - backend
+    env_file:
+      - .env
+    networks:
+      - analyzer_net
+
+networks:
+  analyzer_net:
+    driver: bridge

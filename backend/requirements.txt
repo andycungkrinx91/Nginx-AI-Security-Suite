@@ -1,0 +1,21 @@
+# FastAPI and Server
+fastapi
+uvicorn[standard]
+python-multipart
+pydantic-settings
+
+# AI and RAG Libraries
+langchain
+langchain-community
+langchain-google-genai
+google-generativeai
+faiss-cpu
+requests
+
+# Utilities
+python-dotenv
+pandas
+reportlab
+
+# SSE for Frontend
+sse-starlette
