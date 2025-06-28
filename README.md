@@ -8,7 +8,9 @@
 
 An AI-powered suite of tools designed to enhance web server security by analyzing Nginx logs and auditing website security headers. This project leverages a **Retrieval-Augmented Generation (RAG)** pipeline with **Google's Gemini models** to provide intelligent, context-aware security recommendations.
 
-> ![Home Page Screenshot](https://i.imgur.com/your-home-page-screenshot.png)
+> ![Home Page Screenshot](https://github.com/andycungkrinx91/Nginx-AI-Security-Suite/tree/master/images/homepage.png)
+> ![Log Analyzer Page Screenshot](https://github.com/andycungkrinx91/Nginx-AI-Security-Suite/tree/master/images/log-analyzer.png)
+> ![Website Header Analyzer Page Screenshot](https://github.com/andycungkrinx91/Nginx-AI-Security-Suite/tree/master/images/header-analyzer.png)
 
 ---
 
@@ -143,3 +145,21 @@ Ensure the following tools are installed:
 
 Distributed under the MIT License.  
 See `LICENSE` for more information.
+
+---
+
+<!-- Badge References -->
+[Python-badge]: https://img.shields.io/badge/Python-3.10%2B-blue.svg
+[Python-url]: https://www.python.org/
+
+[FastAPI-badge]: https://img.shields.io/badge/FastAPI-async--ready-green.svg
+[FastAPI-url]: https://fastapi.tiangolo.com/
+
+[Streamlit-badge]: https://img.shields.io/badge/Streamlit-frontend-orange.svg
+[Streamlit-url]: https://streamlit.io/
+
+[Docker-badge]: https://img.shields.io/badge/Docker-containerized-blue.svg
+[Docker-url]: https://www.docker.com/
+
+[LangChain-badge]: https://img.shields.io/badge/LangChain-RAG--pipeline-purple.svg
+[LangChain-url]: https://www.langchain.com/
