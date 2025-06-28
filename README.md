@@ -8,9 +8,9 @@
 
 An AI-powered suite of tools designed to enhance web server security by analyzing Nginx logs and auditing website security headers. This project leverages a **Retrieval-Augmented Generation (RAG)** pipeline with **Google's Gemini models** to provide intelligent, context-aware security recommendations.
 
-> ![Home Page Screenshot](https://github.com/andycungkrinx91/Nginx-AI-Security-Suite/tree/master/images/homepage.png)
-> ![Log Analyzer Page Screenshot](https://github.com/andycungkrinx91/Nginx-AI-Security-Suite/tree/master/images/log-analyzer.png)
-> ![Website Header Analyzer Page Screenshot](https://github.com/andycungkrinx91/Nginx-AI-Security-Suite/tree/master/images/header-analyzer.png)
+![Home Page Screenshot](https://raw.githubusercontent.com/andycungkrinx91/Nginx-AI-Security-Suite/master/images/homepage.png)
+![Log Analyzer Page Screenshot](https://raw.githubusercontent.com/andycungkrinx91/Nginx-AI-Security-Suite/master/images/log-analyzer.png)
+![Website Header Analyzer Page Screenshot](https://raw.githubusercontent.com/andycungkrinx91/Nginx-AI-Security-Suite/master/images/header-analyzer.png)
 
 ---
 
