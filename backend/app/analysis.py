@@ -1,6 +1,8 @@
 import os
-from typing import Dict, Any, Tuple
+import re
+from typing import Dict, Any, Tuple, List
 
+# --- LangChain & Google AI Imports ---
 from langchain_google_genai import GoogleGenerativeAI, GoogleGenerativeAIEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain.chains import RetrievalQA
@@ -11,18 +13,71 @@ from langchain.docstore.document import Document
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 GEMINI_MODEL_NAME = os.getenv("GEMINI_MODEL_NAME", "gemini-1.5-flash-latest")
 EMBEDDING_MODEL_NAME = os.getenv("EMBEDDING_MODEL_NAME", "models/text-embedding-004")
-FAISS_INDEX_PATH = "vector_store/faiss_index"
+# --- FILENAME UPDATED HERE ---
+# The path to the regex patterns file, assuming it's in the backend root
+REGEX_PATTERNS_PATH = "owasp_regex_patterns.txt"
+
+# --- Global variable for compiled regex patterns ---
+COMPILED_REGEX_PATTERNS: List[Dict] = []
+
+
+def load_and_compile_regex():
+    """
+    Loads and compiles regex patterns from the specified file.
+    This version now correctly parses the '[ID] Name:Pattern' format.
+    """
+    global COMPILED_REGEX_PATTERNS
+    script_dir = os.path.dirname(__file__)
+    regex_file_path = os.path.join(script_dir, '..', REGEX_PATTERNS_PATH)
+    
+    print(f"Attempting to load and compile regex patterns from: {os.path.abspath(regex_file_path)}")
+    try:
+        with open(regex_file_path, 'r') as f:
+            for line in f:
+                # Use regex to parse the format: [ID] Name:Pattern
+                match = re.match(r'\[(\d+)\]\s*([^:]+):\s*(.*)', line)
+                if match:
+                    rule_id, name, pattern = match.groups()
+                    try:
+                        COMPILED_REGEX_PATTERNS.append({
+                            "id": rule_id.strip(),
+                            "name": name.strip(),
+                            "pattern": re.compile(pattern.strip())
+                        })
+                    except re.error as e:
+                        print(f"Warning: Could not compile regex for '{name}' (ID: {rule_id}): {e}")
+        print(f"✅ Successfully loaded and compiled {len(COMPILED_REGEX_PATTERNS)} regex patterns.")
+    except FileNotFoundError:
+        print(f"Warning: {regex_file_path} not found. Regex scanning will be disabled.")
+    except Exception as e:
+        print(f"An error occurred while loading regex patterns: {e}")
+
+
+def scan_log_with_regex(log_content: str) -> List[str]:
+    """
+    Scans log content with pre-compiled regex patterns and returns a list of unique findings.
+    """
+    findings = set()
+    if not COMPILED_REGEX_PATTERNS:
+        return []
+
+    for i, line in enumerate(log_content.splitlines()):
+        for regex in COMPILED_REGEX_PATTERNS:
+            if regex["pattern"].search(line):
+                # Include the ID in the finding for better traceability
+                finding = f"Line {i+1}: [ID {regex['id']}] Found potential '{regex['name']}' pattern."
+                findings.add(finding)
+    return sorted(list(findings))
 
 
 def initialize_rag_pipeline() -> Tuple[Any, Any, str]:
     """
-    Initializes and returns the RAG pipeline components.
-    On success, returns (llm, rag_chain, None).
-    On failure, returns (None, None, error_message).
+    Initializes the RAG pipeline and loads the regex patterns for the hybrid analysis system.
     """
+    load_and_compile_regex()
+
     if not GOOGLE_API_KEY:
         error_msg = "CRITICAL: GOOGLE_API_KEY environment variable not found."
-        print(error_msg)
         return None, None, error_msg
 
     try:
@@ -32,61 +87,49 @@ def initialize_rag_pipeline() -> Tuple[Any, Any, str]:
             temperature=0.8,
             max_output_tokens=10240
         )
-        embeddings = GoogleGenerativeAIEmbeddings(model=EMBEDDING_MODEL_NAME, google_api_key=GOOGLE_API_KEY)
+        
+        prompt_template = """You are a world-class cybersecurity analyst. You have been provided with a summary of potential threats found by a regex scanner in an Nginx log file. Your goal is to provide a comprehensive, clear, and actionable security report based on these findings.
 
-        if os.path.exists(FAISS_INDEX_PATH):
-            vector_store = FAISS.load_local(FAISS_INDEX_PATH, embeddings, allow_dangerous_deserialization=True)
-        else:
-            vector_store = create_and_save_new_index(embeddings)
+        **Regex Scan Findings:**
+        ```
+        {context}
+        ```
 
-        retriever = vector_store.as_retriever()
+        **Log Snippet (for additional context):**
+        ```
+        {question}
+        ```
 
-        # --- NEW & IMPROVED PROMPT ---
-        prompt_template = """You are a world-class cybersecurity analyst and incident responder. Your goal is to provide a comprehensive, clear, and actionable security report based on the provided Nginx log snippet and retrieved context.
+        Your response MUST be detailed and structured in Markdown with the following sections:
 
-        Context: {context}
+        ## 1. Executive Summary
+        Provide a high-level overview of the findings. Mention the most critical threats discovered based on the regex scan.
 
-        Log Snippet: {question}
-
-        Your response MUST be detailed and structured in the following five parts using Markdown. Use bolding and bullet points to make the report easy to read.
-
-        ## 1. Threat Classification & Severity
-            * **Threat**: Clearly state the most likely attack pattern (e.g., SQL Injection, Cross-Site Scripting, Path Traversal, Reconnaissance Scan). If no threat is apparent, state "Informational" or "No Immediate Threat Detected."
-            * **Severity**: Assign a severity level (Critical, High, Medium, Low, or Informational) and briefly justify your reasoning.
-
-        ## 2. Detailed Analysis & Indicators
-            * Explain *exactly* why you classified the log entry as you did, referencing the context provided.
-            * Quote the specific malicious parts of the log snippet that act as Indicators of Compromise (IoCs).
-            * Explain the attacker's likely goal with this specific payload.
+        ## 2. Detailed Threat Analysis
+        For each threat type found by the scanner (e.g., SQLi, XSS), create a subsection. Explain the risk, why it was flagged, and what the attacker's goal might be. Reference specific lines and rule IDs if possible.
 
         ## 3. Multi-Layer Hardening Recommendations
-            * Provide a prioritized list of specific, actionable steps to mitigate this threat.
-            * **Web Server Layer (Nginx/WAF):** Suggest specific Nginx configuration changes or ModSecurity-style WAF rules to block this pattern at the edge.
-            * **Application Layer:** Describe the necessary code changes (e.g., "Use parameterized queries/prepared statements to prevent SQLi," or "Implement context-aware output encoding for all user-supplied data to prevent XSS").
-            * **Network Layer:** Suggest relevant firewall rules if applicable (e.g., "Block the attacking IP address `123.45.67.89` at the network firewall").
+        Provide a prioritized list of specific, actionable steps to mitigate the identified threats at the Web Server (Nginx/WAF), Application, and Network layers.
 
-        ## 4. Incident Response Next Steps
-            * Provide a short, actionable checklist of immediate steps the user should take. For example:
-                * Investigate other logs from the same source IP address.
-                * Check if the attack was successful by looking for unusual database activity or defaced pages.
-                * Scan the application for similar vulnerabilities.
-
-        ## 5. Further Reading
-            * Based on the threat, provide 2-3 high-quality reference links to authoritative sources that describe the attack. Use the following links as your source of truth:
-                * SQL Injection: `https://owasp.org/www-community/attacks/SQL_Injection`
-                * Cross-Site Scripting (XSS): `https://owasp.org/www-community/attacks/xss/`
-                * Path Traversal: `https://owasp.org/www-community/attacks/Path_Traversal`
+        ## 4. Further Reading
+        Provide 2-3 high-quality reference links from authoritative sources (like OWASP) for the most critical threats found.
         """
         PROMPT = PromptTemplate(template=prompt_template, input_variables=["context", "question"])
 
-        rag_chain = RetrievalQA.from_chain_type(
+        dummy_retriever = FAISS.from_texts(
+            ["Placeholder for RAG chain initialization"], 
+            GoogleGenerativeAIEmbeddings(model=EMBEDDING_MODEL_NAME, google_api_key=GOOGLE_API_KEY)
+        ).as_retriever()
+
+        chain = RetrievalQA.from_chain_type(
             llm=llm,
             chain_type="stuff",
-            retriever=retriever,
+            retriever=dummy_retriever,
             chain_type_kwargs={"prompt": PROMPT},
-            return_source_documents=True,
+            return_source_documents=False
         )
-        return llm, rag_chain, None
+        
+        return llm, chain, None
 
     except Exception as e:
         error_details = f"ERROR DETAILS: {e}"
@@ -94,34 +137,33 @@ def initialize_rag_pipeline() -> Tuple[Any, Any, str]:
         return None, None, str(e)
 
 
-def create_and_save_new_index(embeddings: Any) -> FAISS:
-    """Creates a new FAISS index from a base knowledge base and saves it."""
-    print(f"No FAISS index found. Creating a new one at: {FAISS_INDEX_PATH}")
-    knowledge_base = [
-        Document(page_content="SQL Injection (SQLi) indicators include ' or 1=1, UNION SELECT.", metadata={"source": "OWASP-SQLi"}),
-        Document(page_content="Cross-Site Scripting (XSS) indicators include <script>, onerror=, javascript:.", metadata={"source": "OWASP-XSS"}),
-        Document(page_content="Path Traversal indicators are '../' or '..\\' sequences.", metadata={"source": "OWASP-PathTraversal"}),
-        Document(page_content="Reconnaissance scanning can be identified by user agents like Nmap or Nikto.", metadata={"source": "Scanning-Tools"}),
-    ]
-    vector_store = FAISS.from_documents(knowledge_base, embeddings)
-    os.makedirs(FAISS_INDEX_PATH, exist_ok=True)
-    vector_store.save_local(FAISS_INDEX_PATH)
-    print("New FAISS index created and saved successfully.")
-    return vector_store
-
-
 def analyze_log_data(log_content: str, rag_chain: Any) -> Dict[str, Any]:
-    """Main analysis function receives the rag_chain as an argument."""
+    """
+    New analysis workflow: First, scan with Regex, then use the AI to analyze those specific findings.
+    """
     if not rag_chain:
-        return {"summary": "## Analysis Failed\n\n**Reason:** RAG chain is not available."}
+        return {"summary": "## Analysis Failed\n\n**Reason:** AI pipeline is not available."}
 
-    question_snippet = "\n".join(log_content.strip().splitlines()[:10])
-    try:
-        result = rag_chain.invoke({"query": question_snippet})
-        retrieved_sources = [doc.metadata.get("source", "Unknown Source") for doc in result.get("source_documents", [])]
+    regex_findings = scan_log_with_regex(log_content)
+    
+    if not regex_findings:
         return {
-            "summary": result.get("result", "No summary provided."),
-            "details": {"retrieved_sources": retrieved_sources},
+            "summary": "## ✅ No Threats Detected\n\nNo suspicious patterns were found in the log file based on the configured regular expressions.",
+            "details": {"regex_findings": []}
+        }
+
+    context_for_ai = "\n".join(regex_findings)
+    log_snippet_for_ai = "\n".join(log_content.strip().splitlines()[:20])
+
+    try:
+        result = rag_chain.invoke({
+            "query": log_snippet_for_ai,
+            "context": context_for_ai
+        })
+        
+        return {
+            "summary": result.get("result", "No AI summary provided."),
+            "details": {"regex_findings": regex_findings}
         }
     except Exception as e:
-        return {"summary": f"## AI Analysis Error\n\n**Error:** {e}", "details": {}}
+        return {"summary": f"## AI Analysis Error\n\n**Error:** {e}", "details": {"regex_findings": regex_findings}}

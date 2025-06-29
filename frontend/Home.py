@@ -1,4 +1,5 @@
 import streamlit as st
+import pandas as pd
 
 # Page config should be set once, at the top of the main app page.
 st.set_page_config(
@@ -7,11 +8,34 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded",
     menu_items={
-        'Get Help': 'https://www.google.com/search?q=nginx+security',
+        'Get Help': 'https://owasp.org/www-project-top-ten/',
         'Report a bug': None,
         'About': "# This is an AI-powered security tool suite!"
     }
 )
+
+# --- OWASP Regex Patterns Data ---
+# In a real app, this might be loaded from a file, but for a static display,
+# defining it here is simple and effective.
+REGEX_DATA = {
+    "ID": [f"[{i:03d}]" for i in range(1, 51)],
+    "Threat Name": [
+        "SQLi", "XSS", "RFI", "LFI", "Command Injection", "Brute Force", 
+        "Path Traversal", "CSRF", "XXE", "SSRF", "Unvalidated Redirects", 
+        "PHP Code Injection", "Javascript Injection", "Header Injection", 
+        "LDAP Injection", "NoSQL Injection", "File Upload Bypass", 
+        "OS Command Execution", "Directory Indexing Exposure", "Sensitive File Access", 
+        "RCE", "SQLi Time-Based", "Unrestricted File Upload", "Command Substitution", 
+        "HTML Injection", "Shellshock", "HTTP Response Splitting", "Buffer Overflow", 
+        "SSTI", "Insecure Deserialization", "Reverse Shell (PHP)", "DNS Rebinding", 
+        "SSRF via Proxy", "Session Fixation", "Unauthorized API Access", 
+        "SQLi Union Select", "Clickjacking", "Open Redirect", "Weak Passwords", 
+        "Excessive Input Validation", "WebSocket Hijacking", "Sudo Command Injection", 
+        "SMTP Injection", "XML Injection", "HTML5 Storage Abuse", 
+        "Debug Mode Disclosure", "Ruby on Rails Code Injection", "CAPTCHA Bypass", 
+        "HTTP Parameter Pollution", "Abuse of Functionality"
+    ]
+}
 
 # --- HEADER ---
 st.title("🛡️ Nginx AI Security Suite")
@@ -28,13 +52,7 @@ with col1:
     with st.container(border=True):
         st.markdown("#### 📄 Log Analyzer")
         st.markdown("""
-        Perform a deep analysis of your Nginx `access.log` files. The AI will identify potential security threats like:
-        - SQL Injection (SQLi)
-        - Cross-Site Scripting (XSS)
-        - Path Traversal
-        - Malicious reconnaissance scans
-        
-        Receive a detailed report with actionable remediation advice.
+        Perform a deep analysis of your Nginx `access.log` files. The hybrid system uses regex to find known threats and then applies AI to generate a detailed report with actionable remediation advice.
         """)
 
 with col2:
@@ -42,12 +60,28 @@ with col2:
         st.markdown("#### 🌐 Website Header Analyzer")
         st.markdown("""
         Scan a live website to check for essential security headers. This tool provides an AI-powered report explaining the risks of missing headers and gives you a ready-to-use Nginx configuration block to fix them.
-        
-        A great way to audit your site's public-facing security posture.
         """)
 
-st.info("Powered by a Retrieval-Augmented Generation (RAG) pipeline using Google's Gemini models.", icon="🤖")
+st.info("Powered by a hybrid system combining high-speed Regex scanning with a Google Gemini RAG pipeline.", icon="🤖")
 
+st.markdown("---")
+
+# --- NEW REGEX PATTERNS SECTION ---
+st.subheader("Threat Intelligence")
+with st.expander("👁️ View the 50 OWASP Threat Patterns We Scan For"):
+    df = pd.DataFrame(REGEX_DATA)
+    
+    # Use a container with a specific height to make it scrollable
+    with st.container(height=300):
+         st.dataframe(
+             df,
+             use_container_width=True,
+             hide_index=True,
+             column_config={
+                 "ID": st.column_config.TextColumn("ID", width="small"),
+                 "Threat Name": st.column_config.TextColumn("Threat Name"),
+             }
+         )
 
 # --- FOOTER ---
 st.markdown("---")

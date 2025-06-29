@@ -6,130 +6,126 @@
 [![Docker][Docker-badge]][Docker-url]
 [![LangChain][LangChain-badge]][LangChain-url]
 
-An AI-powered suite of tools designed to enhance web server security by analyzing Nginx logs and auditing website security headers. This project leverages a **Retrieval-Augmented Generation (RAG)** pipeline with **Google's Gemini models** to provide intelligent, context-aware security recommendations.
+An AI-powered suite of tools designed to enhance web server security by analyzing Nginx logs and auditing website security headers. This project leverages a hybrid system combining fast regex-based pattern matching with a Retrieval-Augmented Generation (RAG) pipeline using Google's Gemini models to provide intelligent, context-aware security advice.
 
 ![Home Page Screenshot](https://raw.githubusercontent.com/andycungkrinx91/Nginx-AI-Security-Suite/master/images/homepage.png)
 ![Log Analyzer Page Screenshot](https://raw.githubusercontent.com/andycungkrinx91/Nginx-AI-Security-Suite/master/images/log-analyzer.png)
 ![Website Header Analyzer Page Screenshot](https://raw.githubusercontent.com/andycungkrinx91/Nginx-AI-Security-Suite/master/images/header-analyzer.png)
 
----
+## 🧐 About The Project
 
-## 🧐 About the Project
+In today's digital landscape, web server security is paramount. Misconfigurations and unmonitored logs can leave servers vulnerable to a wide array of attacks. This project provides a user-friendly interface to powerful AI models, allowing developers and system administrators to proactively identify and mitigate security risks in their Nginx deployments.
 
-In today’s threat landscape, even small misconfigurations can open the door to serious web attacks. This project aims to bridge the gap between modern AI and system security by offering:
+The application is composed of two main tools:
 
-- ✅ Automated Nginx log auditing using AI
-- ✅ HTTP security header scanning and grading
-- ✅ Expert-level recommendations and mitigation steps
+* **📄 Log Analyzer:** A powerful tool that ingests Nginx `access.log` files. It first uses a comprehensive set of OWASP-based regular expressions to rapidly identify suspicious patterns, then leverages an AI model to provide a detailed, downloadable PDF report explaining the findings and recommending remediation steps.
+* **🌐 Website Header Analyzer:** A passive scanner that audits the HTTP security headers of any live website. It provides a letter grade for the site's security posture and generates a ready-to-use Nginx configuration block to implement missing headers, complete with an AI-generated explanation.
 
-### 🔧 Tools Included:
-
-- **📄 Log Analyzer**  
-  Analyze Nginx `access.log` files with AI to detect threats such as SQL Injection, XSS, Path Traversal, and reconnaissance attempts. Includes detailed, downloadable PDF reports.
-
-- **🌐 Website Header Analyzer**  
-  Passive scan of HTTP security headers for any live site. It gives a security grade and auto-generates the missing Nginx config block.
-
-All fully containerized using Docker for easy setup and portability.
+The entire suite is containerized with Docker, ensuring a smooth and consistent setup process across different environments.
 
 ---
 
 ## ✨ Features
 
-- 🚀 **AI-Powered Threat Detection** – Uses Google's Gemini for deep contextual analysis.
-- 📚 **RAG-Enhanced Intelligence** – Combines AI with cybersecurity pattern databases.
-- 🖥️ **Interactive UI** – Beautiful, responsive frontend built with Streamlit.
-- ⚙️ **Async Backend** – FastAPI-based backend for responsive, non-blocking tasks.
-- 🔄 **Live Status Updates** – Real-time analysis via Server-Sent Events (SSE).
-- 📄 **Stylish PDF Reports** – Easily share results and findings.
-- 📦 **Fully Containerized** – Seamless setup with Docker and Docker Compose.
+* 🚀 **Hybrid Threat Detection:** Combines high-speed OWASP Top 50 Global Regex scanning for initial threat identification with Google's Gemini models for deep, contextual analysis of the findings.
+* 📚 **RAG-Enhanced Intelligence** The system doesn't just find threats, it understands them. By combining the regex findings with a curated knowledge base, the AI provides detailed explanations and context-aware remediation advice, going far beyond simple pattern matching.
+* 🖥️ **Interactive Frontend:** A beautiful and responsive multi-page application built with Streamlit.
+* ⚙️ **Asynchronous Backend:** A high-performance backend built with FastAPI, capable of handling long-running analysis tasks without blocking the user interface.
+* 🔄 **Real-time Updates:** The Log Analyzer uses Server-Sent Events (SSE) to provide real-time status updates to the user while analysis is in progress.
+* 📄 **Downloadable PDF Reports:** Generate professional, styled PDF reports from the AI's analysis for easy sharing and record-keeping for both tools.
+* 📦 **Containerized & Portable:** Fully containerized with Docker and Docker Compose for easy, one-command setup.
 
 ---
 
 ## 🛠️ Tech Stack
 
-### **Backend**
-- ![Python][Python-badge]
-- ![FastAPI][FastAPI-badge]
-- ![LangChain][LangChain-badge] – Orchestrates the RAG pipeline
-- **Google Generative AI SDK** – Interfaces with Gemini
-- **FAISS** – Vector similarity search
-- **ReportLab** – PDF generation
+This project is built with a modern, robust tech stack.
 
-### **Frontend**
-- ![Streamlit][Streamlit-badge]
+**Backend:**
+* ![Python][Python-badge] (Base Programming Language)
+* ![FastAPI][FastAPI-badge] (For backend API)
+* ![LangChain][LangChain-badge] (for orchestrating the AI pipeline)
+* **OWASP** (for regex patterns)
+* **Google Generative AI SDK** (for interfacing with Gemini)
+* **ReportLab** (for PDF generation)
 
-### **Deployment**
-- ![Docker][Docker-badge]
+**Frontend:**
+* ![Streamlit][Streamlit-badge] (For Frontend)
+
+**Deployment:**
+* ![Docker][Docker-badge] (For Continerized)
 
 ---
 
 ## 🚀 Getting Started
 
-Follow the steps below to get this project running locally for development or testing.
+Follow these instructions to get a copy of the project up and running on your local machine for development and testing purposes.
 
-### 🔧 Prerequisites
+### Prerequisites
 
-Ensure the following tools are installed:
+You must have **Docker** and **Docker Compose** installed on your system.
+* [Install Docker](https://docs.docker.com/get-docker/)
+* [Install Docker Compose](https://docs.docker.com/compose/install/)
 
-- [Docker](https://docs.docker.com/get-docker/)
-- [Docker Compose](https://docs.docker.com/compose/install/)
+### Installation
 
-### 📥 Installation
+1.  **Clone the repository:**
+    ```sh
+    git clone https://github.com/andycungkrinx91/Nginx-AI-Security-Suite.git
+    cd Nginx-AI-Security-Suite
+    ```
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/andycungkrinx91/Nginx-AI-Security-Suite.git
-   cd Nginx-AI-Security-Suite
-   ```
+2.  **Configure Environment Variables:**
+    Create a `.env` file in the root directory by copying the example file.
+    ```sh
+    cp .env-example .env
+    ```
+    Now, open the `.env` file and add your secret keys:
+    ```env
+    # Generate a secure, random key for frontend-backend communication
+    BACKEND_API_KEY="YOUR_SUPER_SECRET_API_KEY"
 
-2. **Set up environment variables**
-   ```bash
-   cp .env-example .env
-   ```
-   Then edit `.env`:
-   ```env
-   BACKEND_API_KEY="YOUR_SUPER_SECRET_API_KEY"
-   GOOGLE_API_KEY="AIzaSy..."
-   GEMINI_MODEL_NAME="gemini-1.5-flash-latest"
-   EMBEDDING_MODEL_NAME="models/text-embedding-004"
-   BACKEND_API_KEY="<your-backend-api-key>"
+    # Your Google AI API Key for Gemini
+    GOOGLE_API_KEY="AIzaSy..."
 
-   ```
+    # (Optional) Specify Gemini model names
+    GEMINI_MODEL_NAME="gemini-1.5-flash-latest"
+    EMBEDDING_MODEL_NAME="models/text-embedding-004"
+    ```
 
-3. **Build and run**
-   ```bash
-   docker-compose up --build
-   ```
+3.  **Build and Run with Docker Compose:**
+    This single command will build the Docker images for both the frontend and backend, and start the application.
+    ```sh
+    docker-compose up --build or docker compose up --build (depends on your docker version)
+    ```
 
-4. **Access the app**
-   - Streamlit UI (Frontend): [http://localhost:5000](http://localhost:5000)
-   - FastAPI docs: [http://localhost:8000/docs](http://localhost:8000/docs)
+4.  **Access the Application:**
+    * The Streamlit frontend will be available at: `http://localhost:5000`
+    * The FastAPI backend documentation will be available at: `http://localhost:8000/docs`
 
 ---
 
 ## 📂 Project Structure
 
+The repository is organized into a `backend` and a `frontend` directory, with supporting Docker and configuration files at the root.
 ```bash
+.
 ├── backend/
 │   ├── app/
-│   │   ├── core/
-│   │   ├── __pycache__/
-│   │   ├── analysis.py            # Log analysis & RAG pipeline
-│   │   ├── scanner.py             # HTTP header scanner logic
-│   │   ├── security.py            # API key auth
-│   ├── vector_store/              # FAISS index storage
+│   │   ├── analysis.py       # Regex + AI log analysis logic
+│   │   ├── scanner.py        # Website header scanning logic
+│   │   └── security.py       # API key authentication
 │   ├── Dockerfile
-│   ├── main.py                    # FastAPI entrypoint
+│   ├── main.py             # FastAPI entrypoint & endpoints
+│   ├── owasp_regex_patterns.txt # Regex patterns for log scanning
 │   └── requirements.txt
 │
 ├── frontend/
-│   ├── .streamlit/
 │   ├── pages/
 │   │   ├── Log_Analyzer.py
 │   │   └── Website_Header_Analyzer.py
 │   ├── Dockerfile
-│   ├── Home.py                    # Main page
+│   ├── Home.py             # Main Streamlit landing page
 │   └── requirements.txt
 │
 ├── .env
@@ -141,25 +137,19 @@ Ensure the following tools are installed:
 
 ---
 
-## 📄 License
+## 👤 Contact
 
-Distributed under the MIT License.  
-See `LICENSE` for more information.
+Andy Setiyawan - [andy.silva270114@gmail.com](mailto:andy.silva270114@gmail.com)
 
----
+Project Link: [https://github.com/andycungkrinx91/Nginx-AI-Security-Suite/](https://github.com/andycungkrinx91/Nginx-AI-Security-Suite/)
 
-<!-- Badge References -->
-[Python-badge]: https://img.shields.io/badge/Python-3.10%2B-blue.svg
+[Python-badge]: https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white
 [Python-url]: https://www.python.org/
-
-[FastAPI-badge]: https://img.shields.io/badge/FastAPI-async--ready-green.svg
+[FastAPI-badge]: https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white
 [FastAPI-url]: https://fastapi.tiangolo.com/
-
-[Streamlit-badge]: https://img.shields.io/badge/Streamlit-frontend-orange.svg
+[Streamlit-badge]: https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white
 [Streamlit-url]: https://streamlit.io/
-
-[Docker-badge]: https://img.shields.io/badge/Docker-containerized-blue.svg
+[Docker-badge]: https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white
 [Docker-url]: https://www.docker.com/
-
-[LangChain-badge]: https://img.shields.io/badge/LangChain-RAG--pipeline-purple.svg
+[LangChain-badge]: https://img.shields.io/badge/LangChain-1E90FF?style=for-the-badge
 [LangChain-url]: https://www.langchain.com/
