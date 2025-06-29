@@ -11,8 +11,6 @@ An AI-powered suite of tools designed to enhance web server security by analyzin
 ![Home Page Screenshot](https://raw.githubusercontent.com/andycungkrinx91/Nginx-AI-Security-Suite/master/images/homepage.png)
 ![Log Analyzer Page Screenshot](https://raw.githubusercontent.com/andycungkrinx91/Nginx-AI-Security-Suite/master/images/log-analyzer.png)
 ![Website Header Analyzer Page Screenshot](https://raw.githubusercontent.com/andycungkrinx91/Nginx-AI-Security-Suite/master/images/header-analyzer.png)
-![Log Analyzer Report Screenshot](https://raw.githubusercontent.com/andycungkrinx91/Nginx-AI-Security-Suite/master/images/report-log-analyzer.png)
-![Website Header Analyzer Report Screenshot](https://raw.githubusercontent.com/andycungkrinx91/Nginx-AI-Security-Suite/master/images/report-header-scanner.png)
 
 ## 🧐 About The Project
 
@@ -20,8 +18,11 @@ In today's digital landscape, web server security is paramount. Misconfiguration
 
 The application is composed of two main tools:
 
-* **📄 Log Analyzer:** A powerful tool that ingests Nginx `access.log` files. It first uses a comprehensive set of OWASP-based regular expressions to rapidly identify suspicious patterns, then leverages an AI model to provide a detailed, downloadable PDF report explaining the findings and recommending remediation steps.
-* **🌐 Website Header Analyzer:** A passive scanner that audits the HTTP security headers of any live website. It provides a letter grade for the site's security posture and generates a ready-to-use Nginx configuration block to implement missing headers, complete with an AI-generated explanation.
+* **📄 Log Analyzer:** A powerful tool that ingests Nginx `access.log` files. It first uses a comprehensive set of OWASP-based regular expressions to rapidly identify suspicious patterns, then leverages an AI model to provide a detailed, downloadable PDF report explaining the findings and recommending remediation steps.<br>
+Sample report: https://raw.githubusercontent.com/andycungkrinx91/Nginx-AI-Security-Suite/master/images/report-log-analyzer.png
+
+* **🌐 Website Header Analyzer:** A passive scanner that audits the HTTP security headers of any live website. It provides a letter grade for the site's security posture and generates a ready-to-use Nginx configuration block to implement missing headers, complete with an AI-generated explanation.<br>
+Sample report: https://raw.githubusercontent.com/andycungkrinx91/Nginx-AI-Security-Suite/master/images/report-header-scanner.png
 
 The entire suite is containerized with Docker, ensuring a smooth and consistent setup process across different environments.
 
