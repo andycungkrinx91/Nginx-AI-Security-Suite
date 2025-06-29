@@ -53,6 +53,7 @@ def get_ai_header_analysis(llm: Any, scan_results: List[Dict], target_url: str) 
     The following critical security headers are missing: **{', '.join(missing_headers)}**.
 
     Please provide a concise, actionable report in Markdown format. The report MUST have the following three sections:
+    # Security Headers Summary
 
     ## 1. Overall Security Grade
     Assign a letter grade (A, B, C, D, or F) based on the number and importance of the missing headers and briefly explain your reasoning.

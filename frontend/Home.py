@@ -8,7 +8,7 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded",
     menu_items={
-        'Get Help': 'https://owasp.org/www-project-top-ten/',
+        'Get Help': 'https://www.google.com/search?q=nginx+security',
         'Report a bug': None,
         'About': "# This is an AI-powered security tool suite!"
     }

@@ -11,6 +11,8 @@ An AI-powered suite of tools designed to enhance web server security by analyzin
 ![Home Page Screenshot](https://raw.githubusercontent.com/andycungkrinx91/Nginx-AI-Security-Suite/master/images/homepage.png)
 ![Log Analyzer Page Screenshot](https://raw.githubusercontent.com/andycungkrinx91/Nginx-AI-Security-Suite/master/images/log-analyzer.png)
 ![Website Header Analyzer Page Screenshot](https://raw.githubusercontent.com/andycungkrinx91/Nginx-AI-Security-Suite/master/images/header-analyzer.png)
+![Log Analyzer Report Screenshot](https://raw.githubusercontent.com/andycungkrinx91/Nginx-AI-Security-Suite/master/images/report-log-analyzer.png)
+![Website Header Analyzer Report Screenshot](https://raw.githubusercontent.com/andycungkrinx91/Nginx-AI-Security-Suite/master/images/report-header-scanner.png)
 
 ## 🧐 About The Project
 
