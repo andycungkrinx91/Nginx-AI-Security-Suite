@@ -5,38 +5,50 @@
 [![Streamlit][Streamlit-badge]][Streamlit-url]
 [![Docker][Docker-badge]][Docker-url]
 [![LangChain][LangChain-badge]][LangChain-url]
+[![OWASP][OWASP-badge]][OWASP-url]
 
-An AI-powered suite of tools designed to enhance web server security by analyzing Nginx logs and auditing website security headers. This project leverages a hybrid system combining fast regex-based pattern matching with a Retrieval-Augmented Generation (RAG) pipeline using Google's Gemini models to provide intelligent, context-aware security advice.
+An AI-powered suite of tools designed to enhance web server security by analyzing Nginx and Apache logs and auditing website security headers. This project leverages a hybrid system combining fast regex-based pattern matching with a Retrieval-Augmented Generation (RAG) pipeline using Google's Gemini models to provide intelligent, context-aware security advice.
 
 ![Home Page Screenshot](https://raw.githubusercontent.com/andycungkrinx91/Nginx-AI-Security-Suite/master/images/homepage.png)
 ![Log Analyzer Page Screenshot](https://raw.githubusercontent.com/andycungkrinx91/Nginx-AI-Security-Suite/master/images/log-analyzer.png)
 ![Website Header Analyzer Page Screenshot](https://raw.githubusercontent.com/andycungkrinx91/Nginx-AI-Security-Suite/master/images/header-analyzer.png)
 
+---
+
 ## 🧐 About The Project
 
-In today's digital landscape, web server security is paramount. Misconfigurations and unmonitored logs can leave servers vulnerable to a wide array of attacks. This project provides a user-friendly interface to powerful AI models, allowing developers and system administrators to proactively identify and mitigate security risks in their Nginx deployments.
+In today's digital landscape, web server security is paramount. Misconfigurations and unmonitored logs can leave servers vulnerable to a wide array of attacks. This project provides a user-friendly interface to powerful AI models, allowing developers and system administrators to proactively identify and mitigate security risks in their Nginx and Apache deployments.
 
 The application is composed of two main tools:
 
-* **📄 Log Analyzer:** A powerful tool that ingests Nginx `access.log` files. It first uses a comprehensive set of OWASP-based regular expressions to rapidly identify suspicious patterns, then leverages an AI model to provide a detailed, downloadable PDF report explaining the findings and recommending remediation steps.<br>
-Sample report: https://raw.githubusercontent.com/andycungkrinx91/Nginx-AI-Security-Suite/master/images/report-log-analyzer.png
+* **📄 Log Analyzer:** A powerful tool that ingests **Nginx or Apache** `access.log` files. It first uses a comprehensive set of OWASP-based regular expressions to rapidly identify suspicious patterns, then leverages an AI model to provide a detailed, downloadable PDF report explaining the findings and recommending remediation steps.
+    <br>Sample report: https://raw.githubusercontent.com/andycungkrinx91/Nginx-AI-Security-Suite/master/images/report-log-analyzer.png
 
-* **🌐 Website Header Analyzer:** A passive scanner that audits the HTTP security headers of any live website. It provides a letter grade for the site's security posture and generates a ready-to-use Nginx configuration block to implement missing headers, complete with an AI-generated explanation.<br>
-Sample report: https://raw.githubusercontent.com/andycungkrinx91/Nginx-AI-Security-Suite/master/images/report-header-scanner.png
+* **🌐 Website Header Analyzer:** A passive scanner that audits the HTTP security headers of any live website. It provides a letter grade for the site's security posture and generates a ready-to-use **Nginx or Apache**  configuration block to implement missing headers, complete with an AI-generated explanation.
+    <br>Sample report: https://raw.githubusercontent.com/andycungkrinx91/Nginx-AI-Security-Suite/master/images/report-header-scanner.png
 
 The entire suite is containerized with Docker, ensuring a smooth and consistent setup process across different environments.
 
 ---
 
+## 🚀 What's New (Changelog)
+
+* **🎉 Feature Update (July 2025): Support for Apache Logs!**
+    * The Log Analyzer tool is no longer limited to Nginx. You can now select "Apache" from a dropdown menu to analyze Apache `access.log` files.
+    * The backend has been enhanced with a dedicated set of regex patterns specifically tailored for common Apache log formats.
+    * The AI's report generation is now dynamic and will correctly reference the log type (Nginx or Apache) in its analysis.
+
+---
+
 ## ✨ Features
 
-* 🚀 **Hybrid Threat Detection:** Combines high-speed OWASP Top 50 Global Regex scanning for initial threat identification with Google's Gemini models for deep, contextual analysis of the findings.
-* 📚 **RAG-Enhanced Intelligence** The system doesn't just find threats, it understands them. By combining the regex findings with a curated knowledge base, the AI provides detailed explanations and context-aware remediation advice, going far beyond simple pattern matching.
-* 🖥️ **Interactive Frontend:** A beautiful and responsive multi-page application built with Streamlit.
-* ⚙️ **Asynchronous Backend:** A high-performance backend built with FastAPI, capable of handling long-running analysis tasks without blocking the user interface.
-* 🔄 **Real-time Updates:** The Log Analyzer uses Server-Sent Events (SSE) to provide real-time status updates to the user while analysis is in progress.
-* 📄 **Downloadable PDF Reports:** Generate professional, styled PDF reports from the AI's analysis for easy sharing and record-keeping for both tools.
-* 📦 **Containerized & Portable:** Fully containerized with Docker and Docker Compose for easy, one-command setup.
+* **Hybrid Threat Detection:** Combines high-speed OWASP regex scanning for initial threat identification with deep AI analysis for confirmation and context.
+* **RAG-Enhanced Intelligence:** The system doesn't just find threats; it understands them. By combining the regex findings with a curated knowledge base, the AI provides detailed explanations and context-aware remediation advice, going far beyond simple pattern matching.
+* **Interactive Frontend:** A beautiful and responsive multi-page application built with Streamlit.
+* **Asynchronous Backend:** A high-performance backend built with FastAPI, capable of handling long-running analysis tasks without blocking the user interface.
+* **Real-time Updates:** The Log Analyzer uses Server-Sent Events (SSE) to provide real-time status updates to the user while analysis is in progress.
+* **Downloadable PDF Reports:** Generate professional, styled PDF reports from the AI's analysis for easy sharing and record-keeping for both tools.
+* **Containerized & Portable:** Fully containerized with Docker and Docker Compose for easy, one-command setup.
 
 ---
 
@@ -45,18 +57,18 @@ The entire suite is containerized with Docker, ensuring a smooth and consistent 
 This project is built with a modern, robust tech stack.
 
 **Backend:**
-* ![Python][Python-badge] (Base Programming Language)
-* ![FastAPI][FastAPI-badge] (For backend API)
-* ![LangChain][LangChain-badge] (for orchestrating the AI pipeline)
-* **OWASP** (for regex patterns)
+* ![Python][Python-badge]
+* ![FastAPI][FastAPI-badge]
+* ![LangChain][LangChain-badge]
+* ![OWASP][OWASP-badge] (for regex patterns)
 * **Google Generative AI SDK** (for interfacing with Gemini)
 * **ReportLab** (for PDF generation)
 
 **Frontend:**
-* ![Streamlit][Streamlit-badge] (For Frontend)
+* ![Streamlit][Streamlit-badge]
 
 **Deployment:**
-* ![Docker][Docker-badge] (For Continerized)
+* ![Docker][Docker-badge]
 
 ---
 
@@ -74,7 +86,7 @@ You must have **Docker** and **Docker Compose** installed on your system.
 
 1.  **Clone the repository:**
     ```sh
-    git clone https://github.com/andycungkrinx91/Nginx-AI-Security-Suite.git
+    git clone [https://github.com/andycungkrinx91/Nginx-AI-Security-Suite.git](https://github.com/andycungkrinx91/Nginx-AI-Security-Suite.git)
     cd Nginx-AI-Security-Suite
     ```
 
@@ -99,7 +111,7 @@ You must have **Docker** and **Docker Compose** installed on your system.
 3.  **Build and Run with Docker Compose:**
     This single command will build the Docker images for both the frontend and backend, and start the application.
     ```sh
-    docker-compose up --build or docker compose up --build (depends on your docker version)
+    docker-compose up --build
     ```
 
 4.  **Access the Application:**
@@ -111,6 +123,7 @@ You must have **Docker** and **Docker Compose** installed on your system.
 ## 📂 Project Structure
 
 The repository is organized into a `backend` and a `frontend` directory, with supporting Docker and configuration files at the root.
+
 ```bash
 .
 ├── backend/
@@ -144,7 +157,7 @@ The repository is organized into a `backend` and a `frontend` directory, with su
 
 Andy Setiyawan - [andy.silva270114@gmail.com](mailto:andy.silva270114@gmail.com)
 
-Project Link: [https://github.com/andycungkrinx91/Nginx-AI-Security-Suite/](https://github.com/andycungkrinx91/Nginx-AI-Security-Suite/)
+Project Link: [https://github.com/andycungkrinx91/Nginx-AI-Security-Suite](https://github.com/andycungkrinx91/Nginx-AI-Security-Suite)
 
 [Python-badge]: https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white
 [Python-url]: https://www.python.org/
@@ -156,3 +169,5 @@ Project Link: [https://github.com/andycungkrinx91/Nginx-AI-Security-Suite/](http
 [Docker-url]: https://www.docker.com/
 [LangChain-badge]: https://img.shields.io/badge/LangChain-1E90FF?style=for-the-badge
 [LangChain-url]: https://www.langchain.com/
+[OWASP-badge]: https://img.shields.io/badge/OWASP-000000?style=for-the-badge&logo=owasp&logoColor=white
+[OWASP-url]: https://owasp.org/

@@ -3,20 +3,18 @@ import pandas as pd
 
 # Page config should be set once, at the top of the main app page.
 st.set_page_config(
-    page_title="Nginx AI Security Suite",
+    page_title="AI Security Suite",
     page_icon="🛡️",
     layout="wide",
     initial_sidebar_state="expanded",
     menu_items={
-        'Get Help': 'https://www.google.com/search?q=nginx+security',
+        'Get Help': 'https://owasp.org/www-project-top-ten/',
         'Report a bug': None,
         'About': "# This is an AI-powered security tool suite!"
     }
 )
 
 # --- OWASP Regex Patterns Data ---
-# In a real app, this might be loaded from a file, but for a static display,
-# defining it here is simple and effective.
 REGEX_DATA = {
     "ID": [f"[{i:03d}]" for i in range(1, 51)],
     "Threat Name": [
@@ -37,13 +35,13 @@ REGEX_DATA = {
     ]
 }
 
-# --- HEADER ---
-st.title("🛡️ Nginx AI Security Suite")
+# --- HEADER (UPDATED) ---
+st.title("🛡️ AI Security Suite")
 st.markdown("Welcome! This application is a set of tools designed to enhance your web server security using AI. **Select a tool from the sidebar to get started.**")
 
 st.markdown("---")
 
-# --- FEATURES SECTION ---
+# --- FEATURES SECTION (UPDATED) ---
 st.subheader("Our Tools")
 
 col1, col2 = st.columns(2)
@@ -52,7 +50,7 @@ with col1:
     with st.container(border=True):
         st.markdown("#### 📄 Log Analyzer")
         st.markdown("""
-        Perform a deep analysis of your Nginx `access.log` files. The hybrid system uses regex to find known threats and then applies AI to generate a detailed report with actionable remediation advice.
+        Perform a deep analysis of your **Nginx** or **Apache** `access.log` files. The hybrid system uses regex to find known threats and then applies AI to generate a detailed report with actionable remediation advice.
         """)
 
 with col2:
@@ -66,12 +64,11 @@ st.info("Powered by a hybrid system combining high-speed Regex scanning with a G
 
 st.markdown("---")
 
-# --- NEW REGEX PATTERNS SECTION ---
+# --- REGEX PATTERNS SECTION ---
 st.subheader("Threat Intelligence")
 with st.expander("👁️ View the 50 OWASP Threat Patterns We Scan For"):
     df = pd.DataFrame(REGEX_DATA)
     
-    # Use a container with a specific height to make it scrollable
     with st.container(height=300):
          st.dataframe(
              df,

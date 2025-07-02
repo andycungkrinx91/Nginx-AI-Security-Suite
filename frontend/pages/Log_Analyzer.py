@@ -3,6 +3,7 @@ import requests
 import os
 import json
 from sseclient import SSEClient
+import pandas as pd # It's good practice to import pandas for the dataframe later
 
 # --- PAGE CONFIGURATION & STATE ---
 st.set_page_config(page_title="Log Analyzer", page_icon="📄", layout="wide")
@@ -20,32 +21,38 @@ API_KEY = os.getenv("BACKEND_API_KEY")
 HEADERS = {"X-API-Key": API_KEY} if API_KEY else None
 
 # --- UI & LOGIC ---
-st.title("📄 AI-Powered Nginx Log Analyzer")
-st.caption("Upload an Nginx access log. The system will use a RAG pipeline with Gemini to identify potential threats and provide a detailed report.")
+st.title("📄 AI-Powered Log Analyzer")
+st.caption("Upload an Nginx or Apache access log. The system will use a hybrid Regex+AI pipeline to identify potential threats and provide a detailed report.")
 
 if not HEADERS:
     st.error("FATAL ERROR: The frontend is missing the BACKEND_API_KEY environment variable.")
     st.stop()
 
+# --- NEW: Log Type Selector Added Here ---
+log_type = st.selectbox(
+    "1. Select Log Format",
+    ("Nginx", "Apache"),
+    key="log_type_selector"
+)
+
+# --- Uploader label is now dynamic ---
 uploaded_file = st.file_uploader(
-    "Upload Nginx `access.log`",
-    type=['log'],
-    key="log_file_uploader" # A stable key for the uploader
+    f"2. Upload your {log_type} `access.log` file",
+    type=['log', 'txt'],
+    key="log_file_uploader" 
 )
 
 col1, col2 = st.columns([1, 4])
 with col1:
-    analyze_button = st.button("Analyze Log", type="primary", use_container_width=True, disabled=(not uploaded_file))
+    analyze_button = st.button("3. Analyze Log File", type="primary", use_container_width=True, disabled=(not uploaded_file))
 with col2:
     if st.button("Clear & Reset", use_container_width=True):
-        # Clear all session state keys to reset the page
         for key in list(st.session_state.keys()):
             del st.session_state[key]
         st.rerun()
 
-# --- SSE LISTENER ---
+# --- SSE LISTENER (Updated to send log_type) ---
 if analyze_button and uploaded_file:
-    # Clear previous run state
     for key in list(st.session_state.keys()):
         if key.startswith('log_'):
              del st.session_state[key]
@@ -53,16 +60,21 @@ if analyze_button and uploaded_file:
 
     with st.status("🚀 Contacting server...", expanded=True) as status:
         try:
-            status.update(label="Sending log file...", state="running")
+            status.update(label="Sending log file to backend...", state="running")
+            
+            # --- API call now sends the selected log_type ---
             files = {'file': (uploaded_file.name, uploaded_file.getvalue(), uploaded_file.type)}
-            response = requests.post(f"{BACKEND_URL}/analyze/", files=files, headers=HEADERS, timeout=90)
+            data = {'log_type': log_type.lower()} # e.g., 'nginx' or 'apache'
+            
+            response = requests.post(f"{BACKEND_URL}/analyze/", files=files, data=data, headers=HEADERS, timeout=90)
+            # --- End of change ---
+
             response.raise_for_status()
             job_id = response.json().get("job_id")
             st.session_state['log_job_id'] = job_id
             
             status.update(label=f"✅ Job started! Listening for real-time results...", state="running")
             
-            # Connect to the SSE stream
             stream_response = requests.get(f"{BACKEND_URL}/stream-results/{job_id}", headers=HEADERS, stream=True)
             client = SSEClient(stream_response)
 
@@ -75,43 +87,52 @@ if analyze_button and uploaded_file:
                     st.rerun()
                     break
                 elif event.event == 'update':
-                    # Check for the detailed step message from the backend
                     update_data = json.loads(event.data)
                     step_message = update_data.get("step", "🧠 AI analysis in progress...")
-                    status.update(label=step_message, state="running")
+                    status.update(label=f"⏳ {step_message}", state="running")
 
+        except requests.exceptions.HTTPError as e:
+            status.update(label="Analysis Failed!", state="error", expanded=True)
+            st.error(f"Error from backend: {e.response.json().get('detail', str(e))}")
         except requests.exceptions.RequestException as e:
             status.update(label="Connection Error!", state="error", expanded=True)
             st.error(f"Connection to backend failed: {e}")
 
-# --- Display Logic ---
+# --- Display Logic (Unchanged, but now includes a check for detailed_findings in PDF payload) ---
 if st.session_state.get('log_analysis_complete'):
     st.header("📊 Log Analysis Report")
     result_content = st.session_state.get('log_analysis_result', {}).get("result", {})
-    result = st.session_state.log_analysis_result
     summary = result_content.get("summary", "No summary available.")
-    details = result.get("details", {})
-    regex_findings = details.get("regex_findings", [])
+    detailed_findings = result_content.get("detailed_findings", []) # This key comes from your latest backend
+
+    # Recreate the Threat Summary for the PDF
+    from collections import Counter
+    threat_counts = Counter(finding["Threat"] for finding in detailed_findings)
+    threat_summary_for_pdf = "\n".join([f"- Found '{threat}' pattern {count} times." for threat, count in sorted(threat_counts.items())])
 
     # PDF Download Button Logic
     if summary and "No summary" not in summary:
         try:
-            pdf_payload = {"markdown_content": summary}
-            pdf_response = requests.post(
-                f"{BACKEND_URL}/download-report",
-                headers=HEADERS,
-                json=pdf_payload
-            )
+            # Recreate the Threat Summary string on the frontend
+            threat_counts = Counter(finding["Threat"] for finding in detailed_findings)
+            threat_summary_for_pdf = "\n".join([f"- Found '{threat}' pattern {count} times." for threat, count in sorted(threat_counts.items())])
+
+            # The payload now correctly includes all necessary fields
+            pdf_payload = {
+                "log_type": "log_analyzer",
+                "markdown_content": summary,
+                "threat_summary": threat_summary_for_pdf,
+                "detailed_findings": detailed_findings
+            }
+            pdf_response = requests.post(f"{BACKEND_URL}/download-report", headers=HEADERS, json=pdf_payload)
             if pdf_response.status_code == 200:
                 st.download_button(
-                    label="⬇️ Download Report as PDF",
+                    label="⬇️ Download Full Report as PDF",
                     data=pdf_response.content,
-                    file_name="LogAnalysisReport.pdf",
+                    file_name="LogAnalysisFullReport.pdf",
                     mime="application/pdf",
                     use_container_width=True
                 )
-            else:
-                st.warning("Could not generate PDF report at this time.")
         except Exception as e:
             st.error(f"Failed to create PDF download link: {e}")
 
@@ -119,8 +140,13 @@ if st.session_state.get('log_analysis_complete'):
     with st.container(border=True):
         st.markdown(summary)
     
-    with st.expander("Show AI Query & Retrieved Knowledge Sources"):
-        st.json(details)
+    # Updated expander to show detailed findings table
+    with st.expander("Show Detailed Threat Findings (Evidence)"):
+        if detailed_findings:
+            df = pd.DataFrame(detailed_findings)
+            st.dataframe(df, use_container_width=True, hide_index=True)
+        else:
+            st.info("No specific threat lines were identified by the regex scan.")
 
 elif st.session_state.get('log_analysis_result') and st.session_state.get('log_analysis_result', {}).get('status') == 'failed':
     st.error("The analysis job failed on the backend.")

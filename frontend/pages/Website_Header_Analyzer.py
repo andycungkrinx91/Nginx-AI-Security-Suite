@@ -78,12 +78,13 @@ if st.session_state.get('header_scan_result'):
     # PDF Download Button Logic
     if ai_explanation and "could not be generated" not in ai_explanation:
         try:
-            pdf_payload = {"markdown_content": ai_explanation}
-            pdf_response = requests.post(
-                f"{BACKEND_URL}/download-report",
-                headers=HEADERS,
-                json=pdf_payload
-            )
+            # This payload is simpler, as it has no threat summary or detailed findings
+            pdf_payload = {
+                "log_type": "header_scanner",
+                "markdown_content": ai_explanation
+                # threat_summary and detailed_findings are omitted
+            }
+            pdf_response = requests.post(f"{BACKEND_URL}/download-report", headers=HEADERS, json=pdf_payload)
             if pdf_response.status_code == 200:
                 st.download_button(
                     label="⬇️ Download Report as PDF",
@@ -92,8 +93,6 @@ if st.session_state.get('header_scan_result'):
                     mime="application/pdf",
                     use_container_width=True
                 )
-            else:
-                st.warning("Could not generate PDF report at this time.")
         except Exception as e:
             st.error(f"Failed to create PDF download link: {e}")
 
