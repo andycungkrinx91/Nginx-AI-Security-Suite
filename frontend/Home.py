@@ -35,30 +35,67 @@ REGEX_DATA = {
     ]
 }
 
-# --- HEADER (UPDATED) ---
+# --- HEADER ---
 st.title("🛡️ AI Security Suite")
 st.markdown("Welcome! This application is a set of tools designed to enhance your web server security using AI. **Select a tool from the sidebar to get started.**")
 
 st.markdown("---")
 
-# --- FEATURES SECTION (UPDATED) ---
+# --- FEATURES SECTION ---
 st.subheader("Our Tools")
 
-col1, col2 = st.columns(2)
+# Data for the tools table
+tools_data = [
+    {
+        "icon": "📄",
+        "title": "Log Analyzer",
+        "description": "Perform a deep analysis of your Nginx or Apache `access.log` files. The hybrid system uses regex to find known threats and then applies AI to generate a detailed report with actionable remediation advice.",
+        "image_url": "https://raw.githubusercontent.com/andycungkrinx91/Nginx-AI-Security-Suite/master/images/log-analyzer.png"
+    },
+    {
+        "icon": "🌐",
+        "title": "Website Header Analyzer",
+        "description": "Scan a live website to check for essential security headers. This tool provides an AI-powered report explaining the risks of missing headers and gives you a ready-to-use Nginx configuration block to fix them.",
+        "image_url": "https://raw.githubusercontent.com/andycungkrinx91/Nginx-AI-Security-Suite/master/images/header-analyzer.png"
+    },
+    {
+        "icon": "🕷️",
+        "title": "Interactive Web Scraper Analyzer",
+        "description": "Utilizes **Playwright** to launch a real browser, navigate to a URL, and analyze its structure and visible links. The AI then assesses the page for potential security attack surfaces.",
+        "image_url": "https://raw.githubusercontent.com/andycungkrinx91/Nginx-AI-Security-Suite/master/images/scraper-analyzer.png"
+    }
+]
 
-with col1:
-    with st.container(border=True):
-        st.markdown("#### 📄 Log Analyzer")
-        st.markdown("""
-        Perform a deep analysis of your **Nginx** or **Apache** `access.log` files. The hybrid system uses regex to find known threats and then applies AI to generate a detailed report with actionable remediation advice.
-        """)
+# Build the HTML table string to display tools with clickable thumbnails
+html_table = """
+<style>
+    .tools-table { width: 100%; border-collapse: collapse; }
+    .tools-table td { padding: 15px; vertical-align: top; border-bottom: 1px solid #333; }
+    .tools-table img { width: 150px; border-radius: 8px; border: 1px solid #444; transition: transform 0.2s; }
+    .tools-table img:hover { transform: scale(1.05); }
+    .tools-table h4 { margin-top: 0; }
+</style>
+<table class="tools-table">
+"""
 
-with col2:
-    with st.container(border=True):
-        st.markdown("#### 🌐 Website Header Analyzer")
-        st.markdown("""
-        Scan a live website to check for essential security headers. This tool provides an AI-powered report explaining the risks of missing headers and gives you a ready-to-use Nginx configuration block to fix them.
-        """)
+for tool in tools_data:
+    html_table += f"""
+    <tr>
+        <td style="width: 160px;">
+            <a href="{tool['image_url']}" target="_blank">
+                <img src="{tool['image_url']}" alt="{tool['title']}">
+            </a>
+        </td>
+        <td>
+            <h4>{tool['icon']} {tool['title']}</h4>
+            <p>{tool['description']}</p>
+        </td>
+    </tr>
+    """
+
+html_table += "</table>"
+
+st.markdown(html_table, unsafe_allow_html=True)
 
 st.info("Powered by a hybrid system combining high-speed Regex scanning with a Google Gemini RAG pipeline.", icon="🤖")
 

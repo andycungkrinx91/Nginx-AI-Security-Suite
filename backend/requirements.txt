@@ -19,3 +19,9 @@ reportlab
 
 # SSE for Frontend
 sse-starlette
+
+# Scapy for Network Analysis
+Scrapy
+playwright
+scrapy-playwright
+redis

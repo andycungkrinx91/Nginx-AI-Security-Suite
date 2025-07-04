@@ -14,6 +14,10 @@ wheels/
 *.egg
 vector_store/
 backend/vector_store/
+
+# Ignore the file-based queue for the interactive scraper
+backend/file_queue/
+
 logs/
 .pytest_cache/
 .tox/

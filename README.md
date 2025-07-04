@@ -9,9 +9,24 @@
 
 An AI-powered suite of tools designed to enhance web server security by analyzing Nginx and Apache logs and auditing website security headers. This project leverages a hybrid system combining fast regex-based pattern matching with a Retrieval-Augmented Generation (RAG) pipeline using Google's Gemini models to provide intelligent, context-aware security advice.
 
-![Home Page Screenshot](https://raw.githubusercontent.com/andycungkrinx91/Nginx-AI-Security-Suite/master/images/homepage.png)
-![Log Analyzer Page Screenshot](https://raw.githubusercontent.com/andycungkrinx91/Nginx-AI-Security-Suite/master/images/log-analyzer.png)
-![Website Header Analyzer Page Screenshot](https://raw.githubusercontent.com/andycungkrinx91/Nginx-AI-Security-Suite/master/images/header-analyzer.png)
+<table align="center">
+  <tr>
+    <td align="center"><b>Home Page</b></td>
+    <td align="center"><b>Log Analyzer</b></td>
+  </tr>
+  <tr>
+    <td><a href="https://raw.githubusercontent.com/andycungkrinx91/Nginx-AI-Security-Suite/master/images/homepage.png" target="_blank"><img src="https://raw.githubusercontent.com/andycungkrinx91/Nginx-AI-Security-Suite/master/images/homepage.png" width="400px" alt="Home Page Screenshot"/></a></td>
+    <td><a href="https://raw.githubusercontent.com/andycungkrinx91/Nginx-AI-Security-Suite/master/images/log-analyzer.png" target="_blank"><img src="https://raw.githubusercontent.com/andycungkrinx91/Nginx-AI-Security-Suite/master/images/log-analyzer.png" width="400px" alt="Log Analyzer Screenshot"/></a></td>
+  </tr>
+  <tr>
+    <td align="center"><b>Header Analyzer</b></td>
+    <td align="center"><b>Interactive Scraper</b></td>
+  </tr>
+  <tr>
+    <td><a href="https://raw.githubusercontent.com/andycungkrinx91/Nginx-AI-Security-Suite/master/images/header-analyzer.png" target="_blank"><img src="https://raw.githubusercontent.com/andycungkrinx91/Nginx-AI-Security-Suite/master/images/header-analyzer.png" width="400px" alt="Header Analyzer Screenshot"/></a></td>
+    <td><a href="https://raw.githubusercontent.com/andycungkrinx91/Nginx-AI-Security-Suite/master/images/scraper-analyzer.png" target="_blank"><img src="https://raw.githubusercontent.com/andycungkrinx91/Nginx-AI-Security-Suite/master/images/scraper-analyzer.png" width="400px" alt="Interactive Scraper Screenshot"/></a></td>
+  </tr>
+</table>
 
 ---
 
@@ -19,19 +34,27 @@ An AI-powered suite of tools designed to enhance web server security by analyzin
 
 In today's digital landscape, web server security is paramount. Misconfigurations and unmonitored logs can leave servers vulnerable to a wide array of attacks. This project provides a user-friendly interface to powerful AI models, allowing developers and system administrators to proactively identify and mitigate security risks in their Nginx and Apache deployments.
 
-The application is composed of two main tools:
+The application is composed of three main tools:
 
 * **📄 Log Analyzer:** A powerful tool that ingests **Nginx or Apache** `access.log` files. It first uses a comprehensive set of OWASP-based regular expressions to rapidly identify suspicious patterns, then leverages an AI model to provide a detailed, downloadable PDF report explaining the findings and recommending remediation steps.
     <br>Sample report: https://raw.githubusercontent.com/andycungkrinx91/Nginx-AI-Security-Suite/master/images/report-log-analyzer.png
 
 * **🌐 Website Header Analyzer:** A passive scanner that audits the HTTP security headers of any live website. It provides a letter grade for the site's security posture and generates a ready-to-use **Nginx or Apache**  configuration block to implement missing headers, complete with an AI-generated explanation.
     <br>Sample report: https://raw.githubusercontent.com/andycungkrinx91/Nginx-AI-Security-Suite/master/images/report-header-scanner.png
+    
+* **🕷️ Interactive Web Scraper:** An intelligent crawler powered by **Playwright** that launches a real browser to navigate a website. It actively interacts with forms (login, search, contact) to identify potential attack surfaces, then uses an AI to generate a security assessment of the discovered interactive elements.
+    <br>Sample report: https://raw.githubusercontent.com/andycungkrinx91/Nginx-AI-Security-Suite/master/images/report-scraper-analyzer.png
 
 The entire suite is containerized with Docker, ensuring a smooth and consistent setup process across different environments.
 
 ---
 
 ## 🚀 What's New (Changelog)
+
+* **✨ New Tool (July 2025): Interactive Web Scraper!**
+    * A new analyzer that uses a real browser (via Playwright) to crawl a website.
+    * It intelligently identifies and attempts to interact with login, search, and contact forms to map out the site's attack surface.
+    * Features a dedicated background worker for robust, asynchronous scraping jobs.
 
 * **🎉 Feature Update (July 2025): Support for Apache Logs!**
     * The Log Analyzer tool is no longer limited to Nginx. You can now select "Apache" from a dropdown menu to analyze Apache `access.log` files.
@@ -45,8 +68,8 @@ The entire suite is containerized with Docker, ensuring a smooth and consistent 
 * **Hybrid Threat Detection:** Combines high-speed OWASP regex scanning for initial threat identification with deep AI analysis for confirmation and context.
 * **RAG-Enhanced Intelligence:** The system doesn't just find threats; it understands them. By combining the regex findings with a curated knowledge base, the AI provides detailed explanations and context-aware remediation advice, going far beyond simple pattern matching.
 * **Interactive Frontend:** A beautiful and responsive multi-page application built with Streamlit.
-* **Asynchronous Backend:** A high-performance backend built with FastAPI, capable of handling long-running analysis tasks without blocking the user interface.
-* **Real-time Updates:** The Log Analyzer uses Server-Sent Events (SSE) to provide real-time status updates to the user while analysis is in progress.
+* **Asynchronous Architecture:** A high-performance FastAPI backend capable of handling long-running analysis tasks without blocking the UI. The Interactive Scraper uses a dedicated background worker and a file-based queue for maximum robustness.
+* **Real-time Updates:** The Log Analyzer uses Server-Sent Events (SSE), and the Scraper uses polling to provide real-time status updates to the user.
 * **Downloadable PDF Reports:** Generate professional, styled PDF reports from the AI's analysis for easy sharing and record-keeping for both tools.
 * **Containerized & Portable:** Fully containerized with Docker and Docker Compose for easy, one-command setup.
 
@@ -61,6 +84,7 @@ This project is built with a modern, robust tech stack.
 * ![FastAPI][FastAPI-badge]
 * ![LangChain][LangChain-badge]
 * ![OWASP][OWASP-badge] (for regex patterns)
+* **Scrapy & Playwright** (for interactive web scraping)
 * **Google Generative AI SDK** (for interfacing with Gemini)
 * **ReportLab** (for PDF generation)
 
@@ -128,18 +152,23 @@ The repository is organized into a `backend` and a `frontend` directory, with su
 .
 ├── backend/
 │   ├── app/
-│   │   ├── analysis.py       # Regex + AI log analysis logic
-│   │   ├── scanner.py        # Website header scanning logic
+│   │   ├── analysis.py       # Log analysis (Regex + AI)
+│   │   ├── scanner.py        # Header scanning logic
+│   │   ├── scraper.py        # Scrapy/Playwright spider
 │   │   └── security.py       # API key authentication
+│   ├── file_queue/         # (Git-ignored) For scraper jobs
 │   ├── Dockerfile
 │   ├── main.py             # FastAPI entrypoint & endpoints
+│   ├── worker.py           # Background worker for the scraper
 │   ├── owasp_regex_patterns.txt # Regex patterns for log scanning
+│   ├── apache_regex_patterns.txt # Regex patterns for Apache
 │   └── requirements.txt
 │
 ├── frontend/
 │   ├── pages/
-│   │   ├── Log_Analyzer.py
-│   │   └── Website_Header_Analyzer.py
+│   │   ├── Log_Analyzer.py   # UI for Log Analyzer
+│   │   ├── Website_Header_Analyzer.py # UI for Header Analyzer
+│   │   └── Interactive_Web_Scraper_Analyzer.py # UI for Scraper
 │   ├── Dockerfile
 │   ├── Home.py             # Main Streamlit landing page
 │   └── requirements.txt

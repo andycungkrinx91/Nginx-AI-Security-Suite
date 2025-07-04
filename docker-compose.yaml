@@ -13,6 +13,21 @@ services:
     networks:
       - analyzer_net
 
+  # The Scraper Worker Service
+  worker:
+    build: ./backend
+    container_name: analyzer_worker
+    command: python worker.py
+    volumes:
+      - ./backend:/code
+      - ./backend/vector_store:/code/vector_store # Ensure worker has access to the vector store
+    depends_on:
+      - backend
+    env_file:
+      - .env
+    networks:
+      - analyzer_net
+
   # The Streamlit Frontend Service
   frontend:
     build: ./frontend

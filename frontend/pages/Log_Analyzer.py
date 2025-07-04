@@ -44,7 +44,7 @@ uploaded_file = st.file_uploader(
 
 col1, col2 = st.columns([1, 4])
 with col1:
-    analyze_button = st.button("3. Analyze Log File", type="primary", use_container_width=True, disabled=(not uploaded_file))
+    analyze_button = st.button("3. Analyze Log File", type="primary", use_container_width=True, disabled=(not uploaded_file or st.session_state.log_job_id is not None))
 with col2:
     if st.button("Clear & Reset", use_container_width=True):
         for key in list(st.session_state.keys()):

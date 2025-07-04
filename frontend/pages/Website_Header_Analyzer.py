@@ -37,7 +37,7 @@ with col1:
         "Analyze with AI",
         type="primary",
         use_container_width=True,
-        disabled=(not st.session_state.header_url_input)
+        disabled=(not st.session_state.header_url_input or st.session_state.header_scan_result is not None)
     )
 with col2:
     if st.button("Clear & Reset", use_container_width=True):

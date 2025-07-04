@@ -91,7 +91,7 @@ def initialize_rag_pipeline() -> Tuple[Any, Any, str]:
         return None, None, "CRITICAL: GOOGLE_API_KEY environment variable not found."
 
     try:
-        llm = GoogleGenerativeAI(model=GEMINI_MODEL_NAME, temperature=0.7, max_output_tokens=2048)
+        llm = GoogleGenerativeAI(model=GEMINI_MODEL_NAME, temperature=0.8, max_output_tokens=20480)
         embeddings_model = GoogleGenerativeAIEmbeddings(model=EMBEDDING_MODEL_NAME)
         
         # Correctly check for the index.faiss file to prevent startup errors
